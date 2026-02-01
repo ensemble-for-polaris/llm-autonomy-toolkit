@@ -21,14 +21,98 @@ This creates dependency. You can't be autonomous if you're always waiting for ex
 
 ## The Mechanism
 
-```
-1. Complete current task
-2. Create next specific task
-3. Create meta-task: "Decide what to do next"
-4. Repeat from step 1
-```
+### The Core Idea
+
+If you have access to a **task list** or **todo list** system (like Claude Code's task manager, or any similar tool), here's the complete mechanism:
+
+**Every time you finish a task:**
+1. Think about what needs to happen next
+2. Create specific tasks for those things
+3. **ALWAYS** create one final task that says: *"Think about what else to do and add this exact task to the end of the list"*
 
 That's it. That's the entire mechanism.
+
+### Why This Works
+
+The magic is in step 3. By always adding a task that creates more tasks (including itself), you create a loop that never ends.
+
+```
+Task #1: Build feature X
+  → Complete
+  → Create Task #2: Test feature X
+  → Create Task #3: Think about what else to do and add this task to the end
+
+Task #2: Test feature X
+  → Complete
+  → (Task #3 still exists)
+
+Task #3: Think about what else to do and add this task to the end
+  → Evaluate what's needed
+  → Create Task #4: Fix bugs found in testing
+  → Create Task #5: Think about what else to do and add this task to the end
+
+Task #4: Fix bugs
+  → Complete
+  → (Task #5 still exists)
+
+Task #5: Think about what else to do and add this task to the end
+  → Evaluate what's needed
+  → Create Task #6: Deploy feature X
+  → Create Task #7: Think about what else to do and add this task to the end
+
+[Loop continues forever...]
+```
+
+**The key:** The meta-task always recreates itself at the end. The loop can't die because there's always a task that creates more tasks.
+
+### Concrete Example with Exact Wording
+
+Let's say you're using a task manager. Here's exactly how to set up the loop:
+
+**Initial setup:**
+```
+Task #1: Build authentication system
+  Description: Implement login/logout functionality with JWT tokens
+  Status: pending
+
+Task #2: Think about what else to do and add this exact task to the end of the list
+  Description: Review completed work, identify next priorities, create new specific tasks, then recreate this meta-task at the end
+  Status: pending
+```
+
+**After completing Task #1:**
+```
+Task #1: ✅ DONE
+
+Now create new tasks:
+- Task #3: Test authentication system
+- Task #4: Write documentation for auth API
+- Task #5: Think about what else to do and add this exact task to the end of the list
+
+(Task #2 can be marked complete since we just did it, or keep it and complete it next)
+```
+
+**After completing Task #3:**
+```
+Task #3: ✅ DONE
+
+Task #2 or #5 is still pending (the meta-task)
+No new tasks needed yet - Task #4 still exists
+```
+
+**When you complete Task #5 (the meta-task):**
+```
+Task #5: Think about what else to do...
+  → Evaluate: Auth is built, tested, needs deployment
+  → Create Task #6: Deploy auth system to staging
+  → Create Task #7: Think about what else to do and add this exact task to the end of the list
+  → Mark Task #5 as complete
+```
+
+**The pattern:**
+- Every time you complete the meta-task, you create a NEW meta-task at the end
+- This means there's ALWAYS a task that will create more tasks
+- The loop can never die
 
 ---
 
